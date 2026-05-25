@@ -2,50 +2,61 @@
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
+
     <title>Ubicación de Maestros</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PWA -->
+    <meta name="theme-color" content="#198754">
+    <link rel="manifest" href="/static/manifest.json">
 
     <style>
 
         body{
             background:#f2fbf5;
-            font-family:Arial;
+            font-family:Arial, sans-serif;
             padding:20px;
+            margin:0;
         }
 
         .container{
-            max-width:500px;
+            max-width:520px;
             margin:auto;
             background:white;
-            padding:20px;
-            border-radius:15px;
-            box-shadow:0 0 10px rgba(0,0,0,0.1);
+            padding:22px;
+            border-radius:16px;
+            box-shadow:0 0 15px rgba(0,0,0,0.08);
         }
 
         .logo{
             text-align:center;
-            margin-bottom:10px;
+            margin-bottom:15px;
         }
 
         .logo img{
             width:180px;
+            max-width:100%;
         }
 
         h2{
             text-align:center;
+            margin-bottom:20px;
+            color:#198754;
         }
 
         input,
         select,
         button{
             width:100%;
-            padding:10px;
+            padding:12px;
             margin-top:10px;
-            border-radius:8px;
+            border-radius:10px;
             border:1px solid #ccc;
             box-sizing:border-box;
+            font-size:15px;
         }
 
         button{
@@ -53,6 +64,11 @@
             color:white;
             border:none;
             cursor:pointer;
+            font-weight:bold;
+        }
+
+        button:hover{
+            opacity:0.95;
         }
 
         .tarjeta{
@@ -63,25 +79,33 @@
             border-radius:10px;
         }
 
+        .tarjeta div{
+            margin-bottom:5px;
+        }
+
         .sin{
             text-align:center;
-            color:red;
+            color:#c62828;
             margin-top:20px;
+            font-weight:bold;
         }
 
     </style>
+
 </head>
 
 <body>
 
     <div class="container">
 
+        <!-- LOGO -->
         <div class="logo">
-            <img src="/static/UDL_LogotipoColor.png">
+            <img src="/static/UDL_LogotipoColor.png" alt="Logo UDL">
         </div>
 
-        <h2>BITÁCORA DIGITAL</h2>
+        <h2>📍 BITÁCORA DIGITAL</h2>
 
+        <!-- FORMULARIO -->
         <form method="post" action="/buscar">
 
             <input
@@ -109,6 +133,7 @@
 
         </form>
 
+        <!-- RESULTADOS -->
         {% if resultados %}
 
             {% for r in resultados %}
@@ -116,23 +141,22 @@
                 <div class="tarjeta">
 
                     <div>
-                        <strong>Hora:</strong>
-                        {{ r.hora }}
+                        ⏰ <strong>{{ r.hora }}</strong>
                     </div>
 
                     <div>
-                        <strong>Aula:</strong>
-                        {{ r.aula }}
+                        🏫 Aula:
+                        <strong>{{ r.aula }}</strong>
                     </div>
 
                     <div>
-                        <strong>Grupo:</strong>
-                        {{ r.grupo }}
+                        👥 Grupo:
+                        <strong>{{ r.grupo }}</strong>
                     </div>
 
                     <div>
-                        <strong>Licenciatura:</strong>
-                        {{ r.licenciatura }}
+                        🎓
+                        <strong>{{ r.licenciatura }}</strong>
                     </div>
 
                 </div>
@@ -148,6 +172,17 @@
         {% endif %}
 
     </div>
+
+    <!-- SERVICE WORKER -->
+    <script>
+
+        if ("serviceWorker" in navigator) {
+
+            navigator.serviceWorker.register("/static/sw.js");
+
+        }
+
+    </script>
 
 </body>
 
