@@ -6,14 +6,20 @@ import pandas as pd
 
 app = FastAPI()
 
-# Carpetas
+# =========================
+# STATIC
+# =========================
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# =========================
+# TEMPLATES
+# =========================
 templates = Jinja2Templates(directory="templates")
 
-
-# ========= CONFIG =========
-
-ARCHIVO = "bitacora ma.xlsx"
+# =========================
+# ARCHIVO EXCEL
+# =========================
+ARCHIVO = "bitacora tarde.xlsx"
 HOJA = "concentrado nocturno"
 
 HORAS = ["4:00", "5:00", "6:00", "7:00", "8:00"]
@@ -26,12 +32,14 @@ DIAS = {
     "viernes": (24, 28),
 }
 
-
-# ========= FUNCIONES =========
-
+# =========================
+# UTILIDADES
+# =========================
 def normalizar(valor):
+
     if pd.isna(valor):
         return ""
+
     return str(valor).strip().upper()
 
 
@@ -40,8 +48,15 @@ def buscar_profesor(matricula, dia):
     resultados = []
 
     matricula = normalizar(matricula)
+    dia = dia.lower()
+
+    if dia not in DIAS:
+        return resultados
+
+    col_inicio, col_fin = DIAS[dia]
 
     try:
+
         df = pd.read_excel(
             ARCHIVO,
             sheet_name=HOJA,
@@ -49,13 +64,10 @@ def buscar_profesor(matricula, dia):
         )
 
     except Exception as e:
-        print(e)
-        return []
 
-    if dia not in DIAS:
-        return []
+        print("ERROR LEYENDO EXCEL:", e)
 
-    inicio, fin = DIAS[dia]
+        return resultados
 
     for fila in range(4, 68):
 
@@ -63,7 +75,7 @@ def buscar_profesor(matricula, dia):
         grupo = normalizar(df.iloc[fila, 1])
         licenciatura = normalizar(df.iloc[fila, 2])
 
-        for i, col in enumerate(range(inicio, fin + 1)):
+        for i, col in enumerate(range(col_inicio, col_fin + 1)):
 
             celda = normalizar(df.iloc[fila, col])
 
@@ -78,21 +90,23 @@ def buscar_profesor(matricula, dia):
 
     return resultados
 
-
-# ========= RUTAS =========
-
+# =========================
+# RUTA INICIO
+# =========================
 @app.get("/", response_class=HTMLResponse)
 async def inicio(request: Request):
 
     return templates.TemplateResponse(
-        "index.html",
-        {
-            "request": request,
+        request=request,
+        name="index.html",
+        context={
             "resultados": None
         }
     )
 
-
+# =========================
+# BUSCAR
+# =========================
 @app.post("/buscar", response_class=HTMLResponse)
 async def buscar(
     request: Request,
@@ -103,9 +117,9 @@ async def buscar(
     resultados = buscar_profesor(matricula, dia)
 
     return templates.TemplateResponse(
-        "index.html",
-        {
-            "request": request,
+        request=request,
+        name="index.html",
+        context={
             "resultados": resultados
         }
     )
