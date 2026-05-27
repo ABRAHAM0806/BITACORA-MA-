@@ -20,7 +20,7 @@ templates = Jinja2Templates(directory="templates")
 # ARCHIVO EXCEL
 # =========================
 ARCHIVO = "bitacora ma.xlsx"
-HOJA = "concentrado diurno."
+HOJA = "pag1."
 
 HORAS = ["4:00", "5:00", "6:00", "7:00", "8:00"]
 
